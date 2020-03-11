@@ -1,0 +1,41 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "env": {
+    "es6": true,
+    "node": true,
+    "jest": true
+  },
+  "plugins": ["@typescript-eslint", "security"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:security/recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "modules": true
+    }
+  },
+  "rules": {
+    "no-console": "off",
+    "@typescript-eslint/explicit-function-return-type": [
+      "off",
+      {
+        "allowTypedFunctionExpressions": true
+      }
+    ],
+    "@typescript-eslint/no-explicit-any": ["off"],
+    "@typescript-eslint/explicit-member-accessibility": "off",
+    "@typescript-eslint/member-delimiter-style": "off",
+    "@typescript-eslint/prefer-interface": "off",
+    "@typescript-eslint/indent": "off",
+    "@typescript-eslint/no-parameter-properties": "off",
+    "@typescript-eslint/class-name-casing": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { "ignoreRestSiblings": true, "argsIgnorePattern": "^_" }
+    ]
+  }
+}

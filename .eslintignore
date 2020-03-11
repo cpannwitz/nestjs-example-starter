@@ -1,0 +1,3 @@
+src/_db
+*.spec.ts
+*.spec.js

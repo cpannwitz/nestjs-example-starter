@@ -1,0 +1,58 @@
+image: node:12.14.1-alpine
+
+cache:
+  key: "$CI_BUILD_REF_NAME"
+  paths:
+    - node_modules/
+    - dist/
+
+.only-default: &only-default
+  only:
+    - develop
+    - merge_requests
+
+.only-master: &only-master
+  only:
+    - master
+
+stages:
+  - prepare
+  - test
+  - build
+  - deploy
+
+prepation:
+  <<: *only-default
+  stage: prepare
+  script:
+    - yarn install
+
+# test_project:
+#   <<: *only-default
+#   stage: test
+#   script:
+#     - yarn test
+
+build_project:
+  <<: *only-default
+  stage: build
+  script:
+    - yarn build
+  artifacts:
+    paths:
+      - dist/
+
+deploy_image:
+  <<: *only-master
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:19.03.5-dind
+  script:
+    - echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
+    - docker build --iidfile imageid.txt -t registry.heroku.com/${HEROKU_APP}/web .
+    - docker push registry.heroku.com/${HEROKU_APP}/web
+    - apk add --no-cache curl
+    - echo "Docker Image ID is $(cat imageid.txt)"
+    - |
+      curl -X PATCH https://api.heroku.com/apps/${HEROKU_APP}/formation --header "Content-Type: application/json" --header "Accept: application/vnd.heroku+json; version=3.docker-releases" --header "Authorization: Bearer ${HEROKU_API_KEY}" --data '{ "updates": [ { "type": "web", "docker_image": "'$(cat imageid.txt)'" } ] }'
